@@ -36,26 +36,34 @@ def decode():
 
     lsb_of_each_pixel = ""
     
-    pixel_depth = 0
+    delimiter_string_bin = to_bin("$$EOM")
     
     if img.mode == "RGBA":
         pixel_depth = 4
     else:
         pixel_depth = 3
+        
+    stop_decoding = False
 
     for i in range(len(pixel_list)):
+        
+        if stop_decoding:
+            break
+        
+        for j in range(len(pixel_list[i])):
+            
+            if stop_decoding:
+                break
 
-            for j in range(len(pixel_list[i])):
+            for w in range(pixel_depth):
 
-                for w in range(pixel_depth):
-
-                    lsb_of_each_pixel += str(last_bit(pixel_list[i][j][w]))
-
-    delimiter_string_bin = to_bin("$$EOM")
-
-    #We keep the left side which contains a valid message before the delimiter telling that the message has ended
-    if delimiter_string_bin in lsb_of_each_pixel:
-        lsb_of_each_pixel = lsb_of_each_pixel.split(delimiter_string_bin)[0]
+                lsb_of_each_pixel += str(last_bit(pixel_list[i][j][w]))
+                
+                #We keep the left side which contains a valid message before the delimiter telling that the message has ended
+                if delimiter_string_bin in lsb_of_each_pixel:
+                    lsb_of_each_pixel = lsb_of_each_pixel.split(delimiter_string_bin)[0]
+                    stop_decoding = True
+                    break
 
     decoded_text = ""
 
@@ -122,8 +130,6 @@ def encode():
 
     #Initialize array containing each transformation that is going to be performed to each rgb value of each pixel
     message_divided_by_parts = []
-    
-    pixel_depth = 0
     
     if img.mode == "RGBA":
         pixel_depth = 4
