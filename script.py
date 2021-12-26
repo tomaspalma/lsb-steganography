@@ -10,7 +10,7 @@ def to_bin(astring):
 
     letter_to_hex = {"a": 10, "b": 11, "c": 12, "d": 13, "e": 14, "f": 15}
 
-    hex_astring = (astring.encode("utf-8")).hex()
+    hex_astring = (astring.encode("unicode_escape")).hex()
     bin_astring = bin(int('1' + hex_astring, 16))[3:]
 
     return bin_astring
@@ -32,7 +32,7 @@ def list_to_tuple(alist):
 
 def decode(file):
     if imghdr.what(file) != 'png':
-        return "Invalid file extension! This type of steganopgrahy only works with uncompressed image formats"
+        return f"Este tipo de steganograpfia não funciona com o formato .{imghdr.what(file)}"
     
     img = Image.open(file)
     
@@ -49,12 +49,27 @@ def decode(file):
                     
                     lsb_of_each_pixel += str(last_bit(pixel_list[i][j][w]))
                     
-    number_of_bytes = int(lsb_of_each_pixel).bit_length() + 7 // 8
-    array_of_bytes = int(lsb_of_each_pixel).to_bytes(number_of_bytes, "big")
+    delimiter_string_bin = to_bin("$$EOM")
     
-    ascii_representation = array_of_bytes.decode()
+    if delimiter_string_bin in lsb_of_each_pixel:
+        lsb_of_each_pixel = lsb_of_each_pixel.split(delimiter_string_bin)[0]
     
-    return ascii_representation
+    decoded_text = ""
+    
+    for i in range(0, len(lsb_of_each_pixel), 8):
+        
+        try:
+            binary_int = int(lsb_of_each_pixel[i:i+8], 2)
+            byte_number = binary_int.bit_length() + 7 // 8
+            binary_array = binary_int.to_bytes(byte_number, "big")
+            decoded_text += binary_array.decode('unicode_escape')
+        except:
+            decoded_text += ""       
+            
+    trimmed_decoded_text = decoded_text.replace("\\u2610", "")
+    
+    return trimmed_decoded_text
+    
     
 def encode(file):
 
@@ -109,6 +124,8 @@ def encode(file):
     
     change_pixels = True
     
+    image_type = imghdr.what(file)
+    
     while change_pixels:
         
         for i in range(times_to_change_row): #Indíce da altura
@@ -139,4 +156,4 @@ def encode(file):
     encoded_image = Image.fromarray(pixel_list)
     encoded_image.save(f"{file.split('.')[0]}_encoded.{file.split('.')[1]}")
 
-print(decode("linus_encoded.png"))
+print(decode("message003.png"))
