@@ -5,6 +5,8 @@ import imghdr
 
 from PIL import Image
 
+# Only working for english characters.
+
 def to_bin(astring):
 
     hex_astring = (astring.encode("unicode_escape")).hex()
@@ -152,6 +154,3 @@ def encode(file):
                    
     encoded_image = Image.fromarray(pixel_list)
     encoded_image.save(f"{file.split('.')[0]}_encoded.{file.split('.')[1]}")
-
-print(encode("landscape.png"))
-print(decode("landscape_encoded.png"))
