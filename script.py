@@ -2,7 +2,6 @@ import PIL
 import numpy
 import math
 import imghdr
-import time
 
 from PIL import Image
 
