@@ -35,12 +35,19 @@ def decode():
     pixel_list = numpy.array(img)
 
     lsb_of_each_pixel = ""
+    
+    pixel_depth = 0
+    
+    if img.mode == "RGBA":
+        pixel_depth = 4
+    else:
+        pixel_depth = 3
 
     for i in range(len(pixel_list)):
 
             for j in range(len(pixel_list[i])):
 
-                for w in range(3):
+                for w in range(pixel_depth):
 
                     lsb_of_each_pixel += str(last_bit(pixel_list[i][j][w]))
 
@@ -114,29 +121,34 @@ def encode():
     pixel_list = numpy.array(img)
 
     #Initialize array containing each transformation that is going to be performed to each rgb value of each pixel
-    message_divided_by_three_parts = []
+    message_divided_by_parts = []
+    
+    pixel_depth = 0
+    
+    if img.mode == "RGBA":
+        pixel_depth = 4
+    elif img.mode == "RGB":
+        pixel_depth = 3
 
     #The range is spaced by three because we are going to change up to three values of each pixel, so each element of the representation of the transformations the programs
     #is going to make is 3 digits long.
-    for i in range(0, len(bin_message), 3):
+    for i in range(0, len(bin_message), pixel_depth):
 
-        if len(bin_message[i:i+3]) != 3:
-                message_divided_by_three_parts.append(bin_message[i:i+3] + " " * (3 - len(bin_message[i:i+3])))
-        elif len(bin_message[i:i+3]) == 0:
+        if len(bin_message[i:i+pixel_depth]) != pixel_depth:
+                message_divided_by_parts.append(bin_message[i:i+pixel_depth] + " " * (pixel_depth - len(bin_message[i:i+pixel_depth])))
+        elif len(bin_message[i:i+pixel_depth]) == 0:
             break
         else:
-            message_divided_by_three_parts.append(bin_message[i:i+3])
+            message_divided_by_parts.append(bin_message[i:i+pixel_depth])
 
     #Each string inside the array represents the transformations for each rgb value of each pixel
     #Hence, we only need to loop through one more line of width if the division between the len of message_divided_by_three_parts is bigger than the width
 
-    times_to_change_row = math.ceil(len(message_divided_by_three_parts) / width)
-    number_of_pixels_to_change = len(message_divided_by_three_parts)
+    times_to_change_row = math.ceil(len(message_divided_by_parts) / width)
+    number_of_pixels_to_change = len(message_divided_by_parts)
 
     keep_changing_pixels = True
-
-    image_type = imghdr.what(file)
-
+    
     while keep_changing_pixels:
 
         for i in range(times_to_change_row): #Indíce da altura
@@ -149,23 +161,25 @@ def encode():
                 if not(keep_changing_pixels):
                     break
 
-                for w in range(3):
+                for w in range(pixel_depth):
 
                     lsb = last_bit(pixel_list[i][j][w])
 
-                    if message_divided_by_three_parts[j][w]== "1" and lsb == 0:
+                    if message_divided_by_parts[j][w]== "1" and lsb == 0:
                         pixel_list[i][j][w] += 1
-                    elif message_divided_by_three_parts[j][w] == "0" and lsb == 1:
+                    elif message_divided_by_parts[j][w] == "0" and lsb == 1:
                         pixel_list[i][j][w] -= 1
 
                 number_of_pixels_to_change -= 1
 
                 if number_of_pixels_to_change == 0:
 
-                    change_pixels = False
+                    keep_changing_pixels = False
 
     encoded_image = Image.fromarray(pixel_list)
     encoded_image.save(f"{file.split('.')[0]}_encoded.{file.split('.')[1]}")
+    
+    return img.mode
 
 def interface():
 
