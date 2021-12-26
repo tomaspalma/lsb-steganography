@@ -2,10 +2,9 @@ import PIL
 import numpy
 import math
 import imghdr
+import time
 
 from PIL import Image
-
-# Only working for english characters.
 
 def to_bin(astring):
 
@@ -29,11 +28,18 @@ def list_to_tuple(alist):
         
     return list(alist_tuple)
 
-def decode(file):
-    if imghdr.what(file) != 'png':
-        return f"Este tipo de steganograpfia não funciona com o formato .{imghdr.what(file)}"
+def decode():
     
-    img = Image.open(file)
+    while True:
+        file = str(input("Image to decode:"))
+        if imghdr.what(file) != 'png':
+            print(f"Este tipo de steganograpfia não funciona com o formato .{imghdr.what(file)}")
+        else:
+            try:
+                img = Image.open(file)
+                break
+            except:
+                print("Image couldn't be loaded")
     
     pixels = img.load()
     pixel_list = numpy.array(img)
@@ -67,17 +73,24 @@ def decode(file):
             
     trimmed_decoded_text = decoded_text.replace("\\u2610", "")
     
-    return trimmed_decoded_text
+    return f"Decoded message: {trimmed_decoded_text}\n"
     
     
-def encode(file):
-
-    img = Image.open(file)
+def encode():
+    
+    while True:
+        try:
+            file = str(input("Image to encode: "))
+            img = Image.open(file)
+            break
+        except:
+            print("Image couldn't be loaded")
+        
 
     width, height = img.size
     number_of_pixels = width * height
 
-    message = str(input("Qual é a mensagem que pretende enviar? "))
+    message = str(input("What is the message you want to encode?"))
     
     bin_message = to_bin(message)
     
@@ -154,3 +167,34 @@ def encode(file):
                    
     encoded_image = Image.fromarray(pixel_list)
     encoded_image.save(f"{file.split('.')[0]}_encoded.{file.split('.')[1]}")
+    
+def interface():
+    
+    print("----------------------------------------------")
+    print("LSB Steganography Encoder & Decoder")
+    print("----------------------------------------------")
+    print("Notice: This program only works with english characters.\n")
+    print("In order to encode or decode an image, you have to store it inside the directory of this program.\n")
+    
+    print("1. Encode\n2. Decode\n3. Exit\n")
+    
+    #Block the program from quitting when non integer input is given by user
+    while True:
+        try: 
+            option = int(input("Choose an option (1, 2 or 3): "))
+        except:
+            print("Choose a number from the options.")
+            
+        if option == 1:
+            print(encode())
+            break
+        elif option == 2:
+            print(decode())
+        elif option == 3:
+            quit()
+        else:
+            print("Choose a number from the options")
+    
+    
+interface()
+    
