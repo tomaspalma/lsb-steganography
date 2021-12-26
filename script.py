@@ -2,13 +2,10 @@ import PIL
 import numpy
 import math
 import imghdr
-import binascii
 
 from PIL import Image
 
 def to_bin(astring):
-
-    letter_to_hex = {"a": 10, "b": 11, "c": 12, "d": 13, "e": 14, "f": 15}
 
     hex_astring = (astring.encode("unicode_escape")).hex()
     bin_astring = bin(int('1' + hex_astring, 16))[3:]
@@ -41,7 +38,7 @@ def decode(file):
     
     lsb_of_each_pixel = ""
     
-    for i in range(len(pixel_list)): #Indíce da altura
+    for i in range(len(pixel_list)):
             
             for j in range(len(pixel_list[i])):
                 
@@ -156,4 +153,5 @@ def encode(file):
     encoded_image = Image.fromarray(pixel_list)
     encoded_image.save(f"{file.split('.')[0]}_encoded.{file.split('.')[1]}")
 
-print(decode("message003.png"))
+print(encode("landscape.png"))
+print(decode("landscape_encoded.png"))
