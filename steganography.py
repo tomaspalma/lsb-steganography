@@ -17,7 +17,7 @@ def last_bit(integer):
     lsb = str(bin(integer))
 
     return int(lsb[len(lsb)-1])
-    
+
 def decode():
 
     while True:
@@ -35,30 +35,30 @@ def decode():
     pixel_list = numpy.array(img)
 
     lsb_of_each_pixel = ""
-    
+
     delimiter_string_bin = to_bin("$$EOM")
-    
+
     if img.mode == "RGBA":
         pixel_depth = 4
     else:
         pixel_depth = 3
-        
+
     stop_decoding = False
 
     for i in range(len(pixel_list)):
-        
+
         if stop_decoding:
             break
-        
+
         for j in range(len(pixel_list[i])):
-            
+
             if stop_decoding:
                 break
 
             for w in range(pixel_depth):
 
                 lsb_of_each_pixel += str(last_bit(pixel_list[i][j][w]))
-                
+
                 #We keep the left side which contains a valid message before the delimiter telling that the message has ended
                 if delimiter_string_bin in lsb_of_each_pixel:
                     lsb_of_each_pixel = lsb_of_each_pixel.split(delimiter_string_bin)[0]
@@ -130,7 +130,7 @@ def encode():
 
     #Initialize array containing each transformation that is going to be performed to each rgb value of each pixel
     message_divided_by_parts = []
-    
+
     if img.mode == "RGBA":
         pixel_depth = 4
     elif img.mode == "RGB":
@@ -154,7 +154,7 @@ def encode():
     number_of_pixels_to_change = len(message_divided_by_parts)
 
     keep_changing_pixels = True
-    
+
     while keep_changing_pixels:
 
         for i in range(times_to_change_row): #Indíce da altura
@@ -178,13 +178,16 @@ def encode():
 
                 number_of_pixels_to_change -= 1
 
+                if j == len(pixel_list[i]) - 1:
+                    message_divided_by_parts = message_divided_by_parts[j+1:]
+
                 if number_of_pixels_to_change == 0:
 
                     keep_changing_pixels = False
 
     encoded_image = Image.fromarray(pixel_list)
     encoded_image.save(f"{file.split('.')[0]}_encoded.{file.split('.')[1]}")
-    
+
     return img.mode
 
 def interface():
