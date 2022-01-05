@@ -23,7 +23,7 @@ def decode():
     while True:
         file = str(input("Image to decode:"))
         if imghdr.what(file) != 'png':
-            print(f"Este tipo de steganograpfia não funciona com o formato .{imghdr.what(file)}")
+            print(f"LSB steganography does not work with this format .{imghdr.what(file)}")
         else:
             try:
                 img = Image.open(file)
