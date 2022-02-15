@@ -204,6 +204,10 @@ def interface():
     while True:
         try:
             option = int(input("Choose an option (1, 2 or 3): "))
+            
+            #In order to also raise an error if the input given by the user is an integer but not 1, 2, or 3:
+            if not(option in {1, 2, 3}):
+                raise "Invalid Option"
         except:
             print("Choose a number from the options.")
 
@@ -214,8 +218,5 @@ def interface():
             print(decode())
         elif option == 3:
             quit()
-        else:
-            print("Choose a number from the options")
-
-
+            
 interface()
